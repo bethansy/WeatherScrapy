@@ -43,15 +43,17 @@ if __name__ == '__main__':
     city_list = json.loads(data_aliyun.stationList_json)
     date_str = (datetime.datetime.now() - datetime.timedelta(days=1)).__format__('%Y%m%d')
     date_str1 = (datetime.datetime.now() - datetime.timedelta(days=1)).__format__('%Y-%m-%d')
-    pool = Pool(80)
+#     pool = Pool(80)
     results = []
     row_lists = weatherCityListProcessor.process(city_list)
     time = datetime.datetime.now()
-    results = pool.map(row_processor, row_lists)
-    pool.close()
-    pool.join()
-    logger = logger.getLogger(os.path.splitext(os.path.basename(__file__))[0])
-    logger.info('craw data success!')
+    for j in row_lists:
+         results.append(row_processor(j)) 
+#     results = pool.map(row_processor, row_lists)
+#     pool.close()
+#     pool.join()
+#     logger = logger.getLogger(os.path.splitext(os.path.basename(__file__))[0])
+#     logger.info('craw data success!')
     results = pd.DataFrame(results)
     # results.columns = ('prs', 'rain', 'sun', 'temp', 'wet', 'wind', 'timepoint',
     #                    'city', 'latitude', 'longitude', 'stationname', 'province',
@@ -59,6 +61,6 @@ if __name__ == '__main__':
     results = results[['timepoint2','province', 'city', 'positionname', 'stationcode',
                       'sun', 'rain', 'prs', 'temp', 'wet', 'wind', 'latitude', 'longitude']]
     results.to_csv(config.dataFilePath+date_str1+'.csv')
-    logger.info('write data success!')
+#     logger.info('write data success!')
     # print(results)
     print(datetime.datetime.now() - time)
